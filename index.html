@@ -3,90 +3,54 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Verify: 399011 Permutator</title>
+  <title>Request Verification</title>
   <style>
-    :root { --radius: 14px; --pad: 18px; }
-    * { box-sizing: border-box; }
     body {
-      margin: 0; font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, Apple Color Emoji, Segoe UI Emoji;
-      background: #0f172a; color: #e2e8f0; display: grid; place-items: center; min-height: 100vh;
+      margin: 0; display: grid; place-items: center; min-height: 100vh;
+      background: #0f172a; font-family: system-ui, sans-serif; color: #fff;
     }
     .card {
-      width: min(520px, 92vw); background: #111827; border: 1px solid #1f2937; border-radius: var(--radius);
-      padding: calc(var(--pad) * 1.2); box-shadow: 0 20px 60px rgba(0,0,0,.35);
+      background: #111827; border: 1px solid #1f2937; border-radius: 12px;
+      padding: 20px; width: 320px; box-shadow: 0 6px 24px rgba(0,0,0,.4);
     }
-    h1 { margin: 0 0 6px; font-size: 20px; font-weight: 650; letter-spacing: .2px; }
-    p.sub { margin: 0 0 16px; opacity: .75; font-size: 13px; }
+    h2 { margin: 0 0 12px; font-size: 16px; font-weight: 600; }
     .output {
-      display: flex; align-items: center; justify-content: space-between; gap: 12px;
-      background: #0b1220; border: 1px solid #1e293b; border-radius: 12px; padding: 14px 14px;
-      font-variant-numeric: tabular-nums; font-size: 28px; letter-spacing: 1.5px;
+      display: flex; align-items: center; justify-content: space-between;
+      background: #0b1220; border: 1px solid #1e293b; border-radius: 8px;
+      padding: 12px 14px; font-size: 22px; letter-spacing: 3px;
+      font-variant-numeric: tabular-nums;
     }
-    .code { font-weight: 700; }
-    .row { display: flex; gap: 10px; margin-top: 14px; flex-wrap: wrap; }
-    button, .toggle {
-      appearance: none; border: 1px solid #334155; background: #0b1220; color: #e2e8f0;
-      padding: 12px 14px; border-radius: 12px; cursor: pointer; font-size: 14px; transition: transform .05s ease, border-color .2s ease, background .2s ease;
+    .code { font-weight: 600; }
+    button {
+      border: none; cursor: pointer; border-radius: 8px;
+      font-size: 14px; padding: 10px 14px; transition: background .2s;
     }
-    button:hover, .toggle:hover { border-color: #475569; }
-    button:active { transform: translateY(1px); }
-    button.primary { background: #2563eb; border-color: #2563eb; }
-    button.primary:hover { background: #1d4ed8; border-color: #1d4ed8; }
-    button:disabled { opacity: .55; cursor: not-allowed; }
-    .hint { margin-top: 10px; font-size: 12px; opacity: .7; }
-    .toggle {
-      display: inline-flex; align-items: center; gap: 8px; user-select: none; padding: 10px 12px;
+    #copyBtn {
+      background: #1e293b; color: #e2e8f0;
     }
-    .toggle input { accent-color: #2563eb; width: 16px; height: 16px; }
-    .pill {
-      display: inline-block; font-size: 11px; padding: 6px 8px; border: 1px solid #334155; border-radius: 999px;
-      background: #0b1220; margin-left: 6px; opacity: .9;
+    #copyBtn:hover { background: #334155; }
+    #genBtn {
+      width: 100%; margin-top: 14px; background: #2563eb; color: #fff;
     }
-    footer { margin-top: 14px; font-size: 11px; opacity: .6; }
+    #genBtn:hover { background: #1d4ed8; }
   </style>
 </head>
 <body>
-  <main class="card" role="main">
-    <h1>Request Verification</h1>
-    <p class="sub">Generates the same 6 digits in a different order on demand: <strong>399011</strong></p>
-
-    <div class="output" aria-live="polite" aria-atomic="true">
-      <span class="code" id="code">— — — — — —</span>
-      <button id="copyBtn" title="Copy to clipboard">Copy</button>
+  <div class="card">
+    <h2>Request Verification</h2>
+    <div class="output">
+      <span id="code">— — — — — —</span>
+      <button id="copyBtn">Copy</button>
     </div>
-
-    <div class="row">
-      <button id="genBtn" class="primary">Request Verification</button>
-      <button id="resetBtn" title="Clear session history">Reset</button>
-      <label class="toggle" title="Cycle through each unique arrangement only once">
-        <input id="uniqueToggle" type="checkbox" />
-        Avoid repeats this session
-        <span class="pill" id="countBadge">0/180 used</span>
-      </label>
-    </div>
-
-    <p class="hint" id="status"></p>
-    <footer>Note: This is not a security OTP—just permutations of fixed digits.</footer>
-  </main>
+    <button id="genBtn">Request Verification</button>
+  </div>
 
   <script>
-    // Core digits and math
-    const BASE = "399011"; // exactly these digits
-    const TOTAL_UNIQUE = 180; // 6! / (2!*2!) because we have two 9s and two 1s
-
+    const BASE = "399011";
     const codeEl = document.getElementById('code');
-    const statusEl = document.getElementById('status');
-    const copyBtn = document.getElementById('copyBtn');
     const genBtn = document.getElementById('genBtn');
-    const resetBtn = document.getElementById('resetBtn');
-    const uniqueToggle = document.getElementById('uniqueToggle');
-    const countBadge = document.getElementById('countBadge');
+    const copyBtn = document.getElementById('copyBtn');
 
-    // Session state
-    let used = new Set();        // stores strings we've shown this session (when uniqueToggle is ON)
-    let pool = [];               // remaining unique permutations (when uniqueToggle is ON)
-
-    // Fisher-Yates shuffle on an array (for random permutation)
     function shuffle(arr) {
       for (let i = arr.length - 1; i > 0; i--) {
         const j = Math.floor(Math.random() * (i + 1));
@@ -94,117 +58,24 @@
       }
       return arr;
     }
-
-    // Generate ONE random permutation (allowing repeats across session)
     function randomPermutation() {
-      const result = shuffle(BASE.split('')).join('');
-      return result;
+      return shuffle(BASE.split('')).join('');
     }
 
-    // Generate all unique permutations (accounting for duplicate digits)
-    function allUniquePermutations(str) {
-      const counts = {};
-      for (const ch of str) counts[ch] = (counts[ch] || 0) + 1;
-      const unique = Object.keys(counts);
-
-      const acc = [];
-      function backtrack(path) {
-        if (path.length === str.length) {
-          acc.push(path.join(''));
-          return;
-        }
-        for (const ch of unique) {
-          if (counts[ch] > 0) {
-            counts[ch]--;
-            path.push(ch);
-            backtrack(path);
-            path.pop();
-            counts[ch]++;
-          }
-        }
-      }
-      backtrack([]);
-      // remove duplicates caused by equal digits ordering
-      // (the backtracking above still respects counts, so duplicates won't be created)
-      return acc;
-    }
-
-    function resetSession() {
-      used.clear();
-      pool = [];
-      if (uniqueToggle.checked) {
-        pool = allUniquePermutations(BASE);
-        shuffle(pool); // randomize order of the full set
-      }
-      updateBadge();
-      statusEl.textContent = uniqueToggle.checked
-        ? 'Unique mode on. You will cycle through each of the 180 permutations without repeats.'
-        : 'Random mode on. Permutations may repeat across clicks.';
-      codeEl.textContent = '— — — — — —';
-      genBtn.disabled = false;
-    }
-
-    function updateBadge() {
-      if (uniqueToggle.checked) {
-        countBadge.textContent = `${used.size}/${TOTAL_UNIQUE} used`;
-        countBadge.style.display = 'inline-block';
-      } else {
-        countBadge.textContent = '';
-        countBadge.style.display = 'none';
-      }
-    }
-
-    function setCodeDisplay(val) {
-      codeEl.textContent = val;
-    }
-
-    function nextCode() {
-      if (uniqueToggle.checked) {
-        if (pool.length === 0) {
-          genBtn.disabled = true;
-          statusEl.textContent = 'All 180 unique permutations have been used. Click Reset to start over.';
-          return;
-        }
-        const next = pool.pop();
-        used.add(next);
-        setCodeDisplay(next);
-        updateBadge();
-        statusEl.textContent = 'Generated a new unique permutation.';
-      } else {
-        // Try to avoid immediate repeat with a small loop; not a guarantee across session
-        let attempt = 0;
-        const prev = codeEl.textContent.replace(/\s/g, '');
-        let candidate = prev;
-        while (attempt < 10 && candidate === prev) {
-          candidate = randomPermutation();
-          attempt++;
-        }
-        setCodeDisplay(candidate);
-        statusEl.textContent = 'Generated a random permutation.';
-      }
-    }
-
-    // Wire up UI
-    copyBtn.addEventListener('click', async () => {
-      const text = codeEl.textContent.replace(/\s/g, '');
-      if (!/^\d{6}$/.test(text)) {
-        statusEl.textContent = 'Nothing to copy yet.';
-        return;
-      }
-      try {
-        await navigator.clipboard.writeText(text);
-        statusEl.textContent = 'Copied to clipboard.';
-      } catch {
-        statusEl.textContent = 'Copy failed (clipboard not available).';
-      }
+    genBtn.addEventListener('click', () => {
+      codeEl.textContent = randomPermutation();
     });
 
-    genBtn.addEventListener('click', nextCode);
-    resetBtn.addEventListener('click', resetSession);
-    uniqueToggle.addEventListener('change', resetSession);
-
-    // Initialize
-    resetSession();
+    copyBtn.addEventListener('click', async () => {
+      const text = codeEl.textContent.replace(/\s/g, '');
+      if (/^\d{6}$/.test(text)) {
+        try {
+          await navigator.clipboard.writeText(text);
+          copyBtn.textContent = "Copied!";
+          setTimeout(() => (copyBtn.textContent = "Copy"), 1500);
+        } catch { copyBtn.textContent = "Fail"; }
+      }
+    });
   </script>
 </body>
 </html>
