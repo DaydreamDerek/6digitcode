@@ -2,13 +2,14 @@
 <html lang="en">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
   <title>Request Verification</title>
   <style>
     body{margin:0;display:grid;place-items:center;min-height:100vh;background:#0f172a;font-family:system-ui,sans-serif;color:#fff}
-    .card{background:#111827;border:1px solid #1f2937;border-radius:12px;padding:20px;width:320px;box-shadow:0 6px 24px rgba(0,0,0,.4)}
+    .card{background:#111827;border:1px solid #1f2937;border-radius:12px;padding:20px;width:360px;box-shadow:0 6px 24px rgba(0,0,0,.4)}
     h2{margin:0 0 12px;font-size:16px;font-weight:600}
-    .output{display:flex;align-items:center;justify-content:space-between;background:#0b1220;border:1px solid #1e293b;border-radius:8px;padding:12px 14px;font-size:22px;letter-spacing:3px;font-variant-numeric:tabular-nums}
+    p.desc{font-size:13px;line-height:1.4;color:#cbd5e1;margin:0 0 14px}
+    .output{display:flex;align-items:center;justify-content:space-between;background:#0b1220;border:1px solid #1e293b;border-radius:8px;padding:12px 14px;font-size:22px;letter-spacing:2px;font-variant-numeric:tabular-nums}
     button{border:none;cursor:pointer;border-radius:8px;font-size:14px;padding:10px 14px;transition:background .2s}
     #copyBtn{background:#1e293b;color:#e2e8f0} #copyBtn:hover{background:#334155}
     #genBtn{width:100%;margin-top:14px;background:#2563eb;color:#fff} #genBtn:hover{background:#1d4ed8}
@@ -17,14 +18,18 @@
 <body>
   <div class="card">
     <h2>Request Verification</h2>
+    <p class="desc">
+      Numeric 6 digit authentication codes suffer from the vulnerability of people looking over your
+      shoulder to get the code. With this tool we use characters that look similar to other characters.
+      This prevents anyone from quickly peeking over your shoulder to use your code.
+      <strong>Added security through obscurity.</strong>
+    </p>
     <div class="output">
       <span id="code">— — — — — —</span>
       <button id="copyBtn">Copy</button>
     </div>
     <button id="genBtn">Request Verification</button>
   </div>
-
-  <!-- External, obfuscated JS (avoids CSP inline-script blocks) -->
   <script src="app.js" defer></script>
 </body>
 </html>
