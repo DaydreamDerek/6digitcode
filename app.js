@@ -1,1 +1,11 @@
-(()=>{"use strict";function _(s){return atob(s)}const $=(i)=>document.getElementById(_(i)),Z=(x)=>Math.floor(Math.random()*x);const IDS={code:"Y29kZQ==",gen:"Z2VuQnRu",copy:"Y29weUJ0bg==",txt:"dGV4dENvbnRlbnQ=",rep:"cmVwbGFjZQ==",ws:"XFxz",g:"Zw==",wrt:"d3JpdGVUZXh0",copd:"Q29waWVkIQ==",copylbl:"Q29weQ=="};const u=$(IDS.code),y=$(IDS.gen),m=$(IDS.copy);function rdig(){return Z(10)}function genPatterns(){const res=[];function backtrack(A,B,C,path){if(path.length===6){if(A===3&&B===2&&C===1)res.push(path);return;} if(A<3)backtrack(A+1,B,C,path+"A"); if(B<2)backtrack(A,B+1,C,path+"B"); if(C<1)backtrack(A,B,C+1,path+"C");} backtrack(0,0,0,"");return res}const PAT=genPatterns();function make(){let a=rdig(),b=rdig(),c=rdig();while(b===a) b=rdig();while(c===a||c===b) c=rdig();const pat=PAT[Z(PAT.length)];return pat.replace(/A/g,a).replace(/B/g,b).replace(/C/g,c)}y.addEventListener("click",()=>{u[_(IDS.txt)]=make()});m.addEventListener("click",async()=>{const txt=u[_(IDS.txt)][_(IDS.rep)](new RegExp(_(IDS.ws),_(IDS.g)),"");if(/^\d{6}$/.test(txt)){try{await navigator.clipboard[_(IDS.wrt)](txt);m[_(IDS.txt)]=_(IDS.copd);setTimeout(()=>m[_(IDS.txt)]=_(IDS.copylbl),1500);}catch(e){}}});})();
+(()=>{"use strict";function _(s){return atob(s)}const $=(i)=>document.getElementById(_(i)),R=(n)=>Math.floor(Math.random()*n);const I={code:"Y29kZQ==",gen:"Z2VuQnRu",copy:"Y29weUJ0bg==",txt:"dGV4dENvbnRlbnQ=",ws:"XFxz",g:"Zw==",rep:"cmVwbGFjZQ==",wrt:"d3JpdGVUZXh0",copd:"Q29waWVkIQ==",copylbl:"Q29weQ=="};const u=$(I.code),y=$(I.gen),m=$(I.copy);
+// token list (base64-encoded to keep it opaque)
+const T=[
+  "MQ==","SQ==","bA==","fA==","Tw==","MA==","Mg==","Wg==",
+  "cm4=","bQ==","NQ==","Uw==","VlY=","Vw=="
+].map(_);
+const L=6; // number of tokens per code
+function make(){let out="";for(let i=0;i<L;i++){out+=T[R(T.length)];}return out;}
+y.addEventListener("click",()=>{u[_(I.txt)]=make();});
+m.addEventListener("click",async()=>{const txt=u[_(I.txt)][_(I.rep)](new RegExp(_(I.ws),_(I.g)),"");if(txt.length>0){try{await navigator.clipboard[_(I.wrt)](txt);m[_(I.txt)]=_(I.copd);setTimeout(()=>m[_(I.txt)]=_(I.copylbl),1500);}catch(e){}}});
+})();
